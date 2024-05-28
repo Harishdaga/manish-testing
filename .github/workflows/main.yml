@@ -20,5 +20,5 @@ jobs:
         username: ${{ secrets.EC2_USER }}
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
-          cd /path/to/your/repo
+          cd /home/ssm-user/data
           git pull origin main
