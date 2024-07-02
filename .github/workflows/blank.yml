@@ -10,19 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
       - name: Install SSH Client
         run: sudo apt-get update && sudo apt-get install -y openssh-client
-
-      - name: Connect to EC2 and Pull Latest Code
-        uses: khs1994/ssh-action@master
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          private-key: ${{ secrets.EC2_KEY }}
-          port: 22
-          script: |
-            cd /home/ec2_user/git_pulled_data
-            git pull origin main
+      - name: connect to ec2 instance
+        run: ssh -i "local-ssh.pem" ec2-user@ec2-3-86-179-237.compute-1.amazonaws.com
