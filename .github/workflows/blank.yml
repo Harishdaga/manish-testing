@@ -3,14 +3,22 @@ name: Deploy to EC2
 on:
   push:
     branches:
-      - main
+      - main  # Adjust branch name as needed
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Install SSH Client
-        run: sudo apt-get update && sudo apt-get install -y openssh-client
-      - name: connect to ec2 instance
-        run: ssh -i "local-ssh.pem" ec2-user@ec2-3-86-179-237.compute-1.amazonaws.com
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: SSH Deploy to EC2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}  # EC2 instance public IP or hostname
+          username: ${{ secrets.EC2_USERNAME }}  # SSH username
+          key: ${{ secrets.SSH_PRIVATE_KEY }}  # SSH private key
+          script: |
+            cd /home/ec2_user/git_pulled_data
+            git pull origin main  # Pull changes from GitHub
+
