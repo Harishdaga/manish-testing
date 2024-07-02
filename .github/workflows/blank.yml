@@ -17,12 +17,12 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y openssh-client
 
       - name: Connect to EC2 and Pull Latest Code
-        uses: garygrossgarten/github-action-ssh@v0.1.7
+        uses: khs1994/ssh-action@master
         with:
-          command: |
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          private-key: ${{ secrets.EC2_KEY }}
+          port: 22
+          script: |
             cd /home/ec2_user/git_pulled_data
             git pull origin main
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.EC2_KEY }}
-          SSH_HOST: ${{ secrets.EC2_HOST }}
-          SSH_USER: ${{ secrets.EC2_USER }}
