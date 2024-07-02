@@ -13,21 +13,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up Node.js 20
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20'
-
       - name: Install SSH Client
         run: sudo apt-get update && sudo apt-get install -y openssh-client
 
-      - name: Run Deployment Script
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.EC2_KEY }}
-        run: |
-          echo "$SSH_PRIVATE_KEY" > private_key.pem
-          chmod 600 private_key.pem
-          ssh -o StrictHostKeyChecking=no -i private_key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+      - name: Connect to EC2 and Pull Latest Code
+        uses: garygrossgarten/github-action-ssh@v0.1.7
+        with:
+          command: |
             cd /home/ec2_user/git_pulled_data
             git pull origin main
-          EOF
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.EC2_KEY }}
+          SSH_HOST: ${{ secrets.EC2_HOST }}
+          SSH_USER: ${{ secrets.EC2_USER }}
