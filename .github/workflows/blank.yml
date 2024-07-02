@@ -10,25 +10,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Setup Node.js 20
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js 20
         uses: actions/setup-node@v3
         with:
           node-version: '20'
-          check-latest: true
-
-      - name: Checkout repository
-        uses: actions/checkout@v3
 
       - name: Install SSH Client
         run: sudo apt-get update && sudo apt-get install -y openssh-client
 
-      - name: Connect to EC2 and Pull Latest Code
-        uses: appleboy/ssh-action@v0.1.6
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_KEY }}
-          passphrase: ${{ secrets.EC2_PASSPHRASE }}
-          script: |
+      - name: Run Deployment Script
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.EC2_KEY }}
+        run: |
+          echo "$SSH_PRIVATE_KEY" > private_key.pem
+          chmod 600 private_key.pem
+          ssh -o StrictHostKeyChecking=no -i private_key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
             cd /home/ec2_user/git_pulled_data
             git pull origin main
+          EOF
